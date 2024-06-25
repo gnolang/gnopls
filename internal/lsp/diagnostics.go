@@ -17,57 +17,35 @@ func (s *server) publishDiagnostics(ctx context.Context, conn jsonrpc2.Conn, fil
 	if err != nil {
 		return err
 	}
-	pkg, ok := s.cache.pkgs.Get(filepath.Dir(string(file.URI.Filename())))
-	if ok {
-		errs := pkg.TypeCheckResult.Errors()
-		if errs != nil {
-			errors = append(errors, errs...)
+
+	if pkg, ok := s.cache.pkgs.Get(filepath.Dir(string(file.URI.Filename()))); ok {
+		filename := filepath.Base(file.URI.Filename())
+		for _, er := range pkg.TypeCheckResult.Errors() {
+			// Skip errors from other files in the same package
+			if !strings.HasSuffix(er.FileName, filename) {
+				continue
+			}
+			errors = append(errors, er)
 		}
 	}
 
-	mPublishDiagnosticParams := make(map[string]*protocol.PublishDiagnosticsParams)
-	publishDiagnosticParams := make([]*protocol.PublishDiagnosticsParams, 0)
+	diagnostics := make([]protocol.Diagnostic, 0) // Init required for JSONRPC to send an empty array
 	for _, er := range errors {
-		if !strings.HasSuffix(file.URI.Filename(), er.FileName) {
-			continue
-		}
-		diagnostic := protocol.Diagnostic{
+		diagnostics = append(diagnostics, protocol.Diagnostic{
 			Range:    *posToRange(er.Line, er.Span),
 			Severity: protocol.DiagnosticSeverityError,
 			Source:   "gnopls",
 			Message:  er.Msg,
 			Code:     er.Tool,
-		}
-		if pdp, ok := mPublishDiagnosticParams[er.FileName]; ok {
-			pdp.Diagnostics = append(pdp.Diagnostics, diagnostic)
-			continue
-		}
-		publishDiagnosticParam := protocol.PublishDiagnosticsParams{
-			URI:         file.URI,
-			Diagnostics: []protocol.Diagnostic{diagnostic},
-		}
-		publishDiagnosticParams = append(publishDiagnosticParams, &publishDiagnosticParam)
-		mPublishDiagnosticParams[er.FileName] = &publishDiagnosticParam
-	}
-
-	// Clean old diagnosed errors if no error found for current file
-	found := false
-	for _, er := range errors {
-		if strings.HasSuffix(er.FileName, filepath.Base(file.URI.Filename())) {
-			found = true
-			break
-		}
-	}
-	if !found {
-		publishDiagnosticParams = append(publishDiagnosticParams, &protocol.PublishDiagnosticsParams{
-			URI:         file.URI,
-			Diagnostics: []protocol.Diagnostic{},
 		})
 	}
 
 	return conn.Notify(
 		ctx,
 		protocol.MethodTextDocumentPublishDiagnostics,
-		publishDiagnosticParams,
+		protocol.PublishDiagnosticsParams{
+			URI:         file.URI,
+			Diagnostics: diagnostics,
+		},
 	)
 }
