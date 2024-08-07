@@ -3,7 +3,7 @@ PROJECT_NAME = gnopls
 BUILD_FLAGS = -mod=readonly -ldflags='$(LD_FLAGS)'
 BUILD_FOLDER = ./build
 
-.PHONY: install build clean
+.PHONY: install build clean genbuiltin
 
 ## install: Install the binary.
 install:
@@ -22,3 +22,6 @@ clean:
 	@echo Cleaning build cache...
 	@-rm -rf $(BUILD_FOLDER) 2> /dev/null
 	@go clean ./...
+
+genbuiltin:
+	@go run ./tools/genbuiltin -src ./tools/gendata/builtin -dest ./internal/builtin/builtin_gen.go

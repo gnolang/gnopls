@@ -1,0 +1,156 @@
+package main
+
+import (
+	"errors"
+	"flag"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+type StringSet map[string]struct{}
+
+type Filter interface {
+	allow(v string) bool
+}
+
+type NopFilter struct{}
+
+func (_ NopFilter) allow(_ string) bool {
+	return true
+}
+
+type DictFilter struct {
+	isIgnoreList bool
+	dict         StringSet
+}
+
+func (f DictFilter) allow(v string) bool {
+	_, ok := f.dict[v]
+	if f.isIgnoreList {
+		ok = !ok
+	}
+
+	return ok
+}
+
+type Params struct {
+	// OutFile is destination where generated Go file will be written.
+	OutFile string
+
+	// OutPackageName is package name specified in output Go file.
+	OutPackageName string
+
+	// SourcePkgDir is source Go package which contains predefined symbols declarations.
+	//
+	// Default is "$GOROOT/src/builtin"
+	SourcePkgDir string
+
+	// Omit is list of symbols to skip. Opposite to Pick.
+	Omit StringSet
+
+	// Pick is a list of symbols to process. Opposite to Omit.
+	Pick StringSet
+}
+
+func (p Params) withDefaults() (Params, error) {
+	if p.OutFile == "" || p.OutPackageName != "" {
+		return p, nil
+	}
+
+	absPath, err := filepath.Abs(p.OutFile)
+	if err != nil {
+		return p, fmt.Errorf("can't resolve absolute path: %w", err)
+	}
+
+	p.OutFile = absPath
+	p.OutPackageName = filepath.Base(filepath.Dir(absPath))
+	if p.OutPackageName == "" {
+		p.OutPackageName = "builtin"
+	}
+
+	return p, nil
+}
+
+func (p Params) validate() error {
+	if p.SourcePkgDir == "" {
+		return errors.New("missing source package path")
+	}
+
+	if p.OutFile == "" {
+		return errors.New("missing destination file name")
+	}
+
+	if _, err := os.Stat(p.SourcePkgDir); err != nil {
+		return fmt.Errorf("source Go package %q doesn't exist: %w", p.SourcePkgDir, err)
+	}
+
+	if len(p.Omit) > 0 && len(p.Pick) > 0 {
+		return errors.New("can't use both -pick and -omit flags together")
+	}
+
+	return nil
+}
+
+func (p Params) getFilter() Filter {
+	if len(p.Omit) > 0 {
+		return DictFilter{
+			isIgnoreList: true,
+			dict:         p.Omit,
+		}
+	}
+
+	if len(p.Pick) > 0 {
+		return DictFilter{
+			dict: p.Pick,
+		}
+	}
+
+	return NopFilter{}
+}
+
+func paramsFromFlags() Params {
+	var params Params
+	flag.StringVar(
+		&params.OutFile, "dest", "",
+		"Destination file name where generated Go file will be written.",
+	)
+	flag.StringVar(
+		&params.OutPackageName, "pkg", "",
+		"Package name specified in output Go file. By default is parent dir name.",
+	)
+	flag.StringVar(
+		&params.SourcePkgDir, "src", "",
+		"Source Go file name with builtin definitions.",
+	)
+
+	var pickList, omitList string
+	flag.StringVar(
+		&pickList, "pick", "",
+		"Comma-separated list of symbols to process. Any other symbols will be ignored.",
+	)
+	flag.StringVar(
+		&omitList, "omit", "",
+		"Comma-separated list of symbols to skip. Opposite to -pick flag.",
+	)
+
+	params.Omit = setFromCSV(omitList)
+	params.Pick = setFromCSV(pickList)
+
+	flag.Parse()
+	return params
+}
+
+func setFromCSV(str string) StringSet {
+	if str == "" {
+		return nil
+	}
+
+	dst := make(StringSet)
+	for _, elem := range strings.Split(str, ",") {
+		dst[strings.TrimSpace(elem)] = struct{}{}
+	}
+
+	return dst
+}
