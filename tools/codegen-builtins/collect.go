@@ -6,6 +6,7 @@ import (
 	"go/printer"
 	"go/token"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"go.lsp.dev/protocol"
@@ -151,14 +152,15 @@ func valueToCompletionItem(fset *token.FileSet, ctx ParentCtx, spec *ast.ValueSp
 	return items, nil
 }
 
-func funcToCompletionItem(fset *token.FileSet, fn *ast.FuncDecl) (item protocol.CompletionItem, err error) {
+func funcToCompletionItem(fset *token.FileSet, format protocol.InsertTextFormat, fn *ast.FuncDecl) (item protocol.CompletionItem, err error) {
+	isSnippet := format == protocol.InsertTextFormatSnippet
 	item = protocol.CompletionItem{
 		Label: fn.Name.String(),
 		Kind:  protocol.CompletionItemKindFunction,
 
 		// Not all LSP clients support snippet mode.
-		InsertTextFormat: protocol.InsertTextFormatPlainText,
-		InsertText:       buildFuncInsertStatement(fn),
+		InsertTextFormat: format,
+		InsertText:       buildFuncInsertStatement(fn, isSnippet),
 		Documentation:    parseDocGroup(fn.Doc),
 	}
 
@@ -170,45 +172,62 @@ func funcToCompletionItem(fset *token.FileSet, fn *ast.FuncDecl) (item protocol.
 	return item, nil
 }
 
-func buildFuncInsertStatement(decl *ast.FuncDecl) string {
+func buildFuncInsertStatement(decl *ast.FuncDecl, asSnippet bool) string {
+	if !asSnippet {
+		return decl.Name.String() + "()"
+	}
+
+	// snippet offsets start at 1
+	offset := 1
+
 	typ := decl.Type
 	sb := new(strings.Builder)
 	sb.Grow(stringBuffSize)
 	sb.WriteString(decl.Name.String())
-	writeTypeParams(sb, typ.TypeParams)
+	offset = writeTypeParams(sb, offset, typ.TypeParams)
 	sb.WriteString("(")
-	writeParamsList(sb, typ.Params)
+	writeParamsList(sb, offset, typ.Params)
 	sb.WriteString(")")
 	return sb.String()
 }
 
-func writeTypeParams(sb *strings.Builder, typeParams *ast.FieldList) {
+func writeTypeParams(sb *strings.Builder, snippetOffset int, typeParams *ast.FieldList) int {
 	if typeParams == nil || len(typeParams.List) == 0 {
-		return
+		return snippetOffset
 	}
 
 	sb.WriteRune('[')
-	writeParamsList(sb, typeParams)
+	offset := writeParamsList(sb, snippetOffset, typeParams)
 	sb.WriteRune(']')
+	return offset
 }
 
-func writeParamsList(sb *strings.Builder, params *ast.FieldList) {
+func writeParamsList(sb *strings.Builder, snippetOffset int, params *ast.FieldList) int {
 	if params == nil || len(params.List) == 0 {
-		return
+		return snippetOffset
 	}
 
+	offset := snippetOffset
 	for i, arg := range params.List {
 		if i > 0 {
 			sb.WriteString(", ")
 		}
+
 		for j, n := range arg.Names {
 			if j > 0 {
 				sb.WriteString(", ")
 			}
 
+			sb.WriteString("${")
+			sb.WriteString(strconv.Itoa(offset))
+			sb.WriteRune(':')
 			sb.WriteString(n.String())
+			sb.WriteRune('}')
+			offset++
 		}
 	}
+
+	return offset
 }
 
 func typeToString(fset *token.FileSet, decl any) (string, error) {

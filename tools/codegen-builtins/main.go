@@ -19,7 +19,7 @@ func main() {
 func mainErr() error {
 	usageFunc := flag.Usage
 	flag.Usage = func() {
-		fmt.Print("genbuiltin - Generates completion items for intrinsic Gno functions.\n\n")
+		fmt.Print("codegen-builtin - Generates completion items for intrinsic Gno functions.\n\n")
 		usageFunc()
 	}
 
@@ -57,7 +57,7 @@ func collectCompletionItems(pkg PackageContext) ([]protocol.CompletionItem, erro
 			continue
 		}
 
-		item, err := funcToCompletionItem(pkg.fset, fn)
+		item, err := funcToCompletionItem(pkg.fset, pkg.insertTextFormat, fn)
 		if err != nil {
 			return nil, fmt.Errorf("failed to process func %q: %w", fn.Name, err)
 		}

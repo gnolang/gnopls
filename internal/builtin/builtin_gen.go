@@ -2,7 +2,7 @@
 // See: /tools/codegen-builtins
 //
 // Source: ./tools/gendata/builtin
-// Skipped: ComplexType,Type,Type1,IntegerType,FloatType
+// Skipped: Type,Type1,IntegerType,FloatType,ComplexType
 
 package builtin
 
@@ -16,7 +16,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The delete built-in function deletes the element with the specified key\n(m[key]) from the map. If m is nil or there is no such element, delete\nis a no-op.\n",
 		},
-		InsertText:       "delete(m, key)",
+		InsertText:       "delete()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "delete",
@@ -122,7 +122,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The len built-in function returns the length of v, according to its type:\n\n```\n\tArray: the number of elements in v.\n\tPointer to array: the number of elements in *v (even if v is nil).\n\tSlice, or map: the number of elements in v; if v is nil, len(v) is zero.\n\tString: the number of bytes in v.\n\tChannel: the number of elements queued (unread) in the channel buffer;\n\t         if v is nil, len(v) is zero.\n\n```\nFor some arguments, such as a string literal or a simple array expression, the\nresult can be a constant.\n",
 		},
-		InsertText:       "len(v)",
+		InsertText:       "len()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "len",
@@ -133,7 +133,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The make built-in function allocates and initializes an object of type\nslice, map, or chan (only). Like new, the first argument is a type, not a\nvalue. Unlike new, make's return type is the same as the type of its\nargument, not a pointer to it. The specification of the result depends on\nthe type:\n\n```\n\tSlice: The size specifies the length. The capacity of the slice is\n\tequal to its length. A second integer argument may be provided to\n\tspecify a different capacity; it must be no smaller than the\n\tlength. For example, make([]int, 0, 10) allocates an underlying array\n\tof size 10 and returns a slice of length 0 and capacity 10 that is\n\tbacked by this underlying array.\n\tMap: An empty map is allocated with enough space to hold the\n\tspecified number of elements. The size may be omitted, in which case\n\ta small starting size is allocated.\n\tChannel: The channel's buffer is initialized with the specified\n\tbuffer capacity. If zero, or the size is omitted, the channel is\n\tunbuffered.\n```\n",
 		},
-		InsertText:       "make(t, size)",
+		InsertText:       "make()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "make",
@@ -161,7 +161,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The panic built-in function stops normal execution of the current\ngoroutine. When a function F calls panic, normal execution of F stops\nimmediately. Any functions whose execution was deferred by F are run in\nthe usual way, and then F returns to its caller. To the caller G, the\ninvocation of F then behaves like a call to panic, terminating G's\nexecution and running any deferred functions. This continues until all\nfunctions in the executing goroutine have stopped, in reverse order. At\nthat point, the program is terminated with a non-zero exit code. This\ntermination sequence is called panicking and can be controlled by the\nbuilt-in function recover.\n",
 		},
-		InsertText:       "panic(v)",
+		InsertText:       "panic()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "panic",
@@ -171,7 +171,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The print built-in function formats its arguments in an\nimplementation-specific way and writes the result to standard error.\nPrint is useful for bootstrapping and debugging; it is not guaranteed\nto stay in the language.\n",
 		},
-		InsertText:       "print(args)",
+		InsertText:       "print()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "print",
@@ -181,7 +181,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The println built-in function formats its arguments in an\nimplementation-specific way and writes the result to standard error.\nSpaces are always added between arguments and a newline is appended.\nPrintln is useful for bootstrapping and debugging; it is not guaranteed\nto stay in the language.\n",
 		},
-		InsertText:       "println(args)",
+		InsertText:       "println()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "println",
@@ -292,7 +292,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The append built-in function appends elements to the end of a slice. If\nit has sufficient capacity, the destination is resliced to accommodate the\nnew elements. If it does not, a new underlying array will be allocated.\nAppend returns the updated slice. It is therefore necessary to store the\nresult of append, often in the variable holding the slice itself:\n\n```\n\tslice = append(slice, elem1, elem2)\n\tslice = append(slice, anotherSlice...)\n\n```\nAs a special case, it is legal to append a string to a byte slice, like this:\n\n```\n\tslice = append([]byte(\"hello \"), \"world\"...)\n```\n",
 		},
-		InsertText:       "append(slice, elems)",
+		InsertText:       "append()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "append",
@@ -324,7 +324,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The copy built-in function copies elements from a source slice into a\ndestination slice. (As a special case, it also will copy bytes from a\nstring to a slice of bytes.) The source and destination may overlap. Copy\nreturns the number of elements copied, which will be the minimum of\nlen(src) and len(dst).\n",
 		},
-		InsertText:       "copy(dst, src)",
+		InsertText:       "copy()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "copy",
@@ -334,7 +334,7 @@ var buckets = map[rune][]protocol.CompletionItem{
 			Kind:  protocol.Markdown,
 			Value: "The cap built-in function returns the capacity of v, according to its type:\n\n```\n\tArray: the number of elements in v (same as len(v)).\n\tPointer to array: the number of elements in *v (same as len(v)).\n\tSlice: the maximum length the slice can reach when resliced;\n\tif v is nil, cap(v) is zero.\n\tChannel: the channel buffer capacity, in units of elements;\n\tif v is nil, cap(v) is zero.\n\n```\nFor some arguments, such as a simple array expression, the result can be a\nconstant.\n",
 		},
-		InsertText:       "cap(v)",
+		InsertText:       "cap()",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "cap",

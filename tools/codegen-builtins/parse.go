@@ -2,23 +2,30 @@ package main
 
 import (
 	"fmt"
+	"go.lsp.dev/protocol"
 	"go/ast"
 	"go/parser"
 	"go/token"
 )
 
 type PackageContext struct {
-	fset   *token.FileSet
-	decls  []*ast.GenDecl
-	funcs  []*ast.FuncDecl
-	filter Filter
+	fset             *token.FileSet
+	decls            []*ast.GenDecl
+	funcs            []*ast.FuncDecl
+	insertTextFormat protocol.InsertTextFormat
+	filter           Filter
 }
 
 func loadPackage(p Params) (PackageContext, error) {
 	fset := token.NewFileSet()
 	ctx := PackageContext{
-		fset:   fset,
-		filter: p.getFilter(),
+		fset:             fset,
+		filter:           p.getFilter(),
+		insertTextFormat: protocol.InsertTextFormatPlainText,
+	}
+
+	if p.EnableInsertSnippets {
+		ctx.insertTextFormat = protocol.InsertTextFormatSnippet
 	}
 
 	pkgs, err := parser.ParseDir(fset, p.SourcePkgDir, nil, parser.ParseComments)

@@ -65,6 +65,11 @@ type Params struct {
 
 	// Pick is a list of symbols to process. Opposite to Omit.
 	Pick StringSet
+
+	// EnableInsertSnippets enables snippet syntax for insertions in protocol.CompletionItem.InsertText.
+	//
+	// See: protocol.InsertTextFormat
+	EnableInsertSnippets bool
 }
 
 func (p Params) GenContext() GenContext {
@@ -145,6 +150,11 @@ func paramsFromFlags() (Params, error) {
 	flag.StringVar(
 		&params.SourcePkgDir, "src", "",
 		"Source Go file name with builtin definitions.",
+	)
+	flag.BoolVar(
+		&params.EnableInsertSnippets, "enable-snippets", false,
+		"Enables snippet syntax in InsertText. "+
+			"Might not be supported by other LSP clients so use this with caution.",
 	)
 
 	var pickList, omitList string

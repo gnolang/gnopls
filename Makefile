@@ -28,4 +28,5 @@ codegen-builtins:
 	@go run ./tools/codegen-builtins \
 	 -omit 'Type,Type1,IntegerType,FloatType,ComplexType' \
 	 -src ./tools/gendata/builtin \
-	 -dest ./internal/builtin/builtin_gen.go
+	 -dest ./internal/builtin/builtin_gen.go \
+	 $(CODEGEN_OPTS)
