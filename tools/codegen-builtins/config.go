@@ -55,10 +55,8 @@ type Params struct {
 	// OutPackageName is package name specified in output Go file.
 	OutPackageName string
 
-	// SourcePkgDir is source Go package which contains predefined symbols declarations.
-	//
-	// Default is "$GOROOT/src/builtin"
-	SourcePkgDir string
+	// SourceFile is source Go file which contains predefined symbols declarations.
+	SourceFile string
 
 	// Omit is list of symbols to skip. Opposite to Pick.
 	Omit StringSet
@@ -75,7 +73,7 @@ type Params struct {
 func (p Params) GenContext() GenContext {
 	return GenContext{
 		PackageName: p.OutPackageName,
-		SourcePath:  p.SourcePkgDir,
+		SourcePath:  p.SourceFile,
 		OmitSymbols: p.Omit.toList(),
 		PickSymbols: p.Pick.toList(),
 	}
@@ -101,16 +99,16 @@ func (p Params) withDefaults() (Params, error) {
 }
 
 func (p Params) validate() error {
-	if p.SourcePkgDir == "" {
-		return errors.New("missing source package path")
+	if p.SourceFile == "" {
+		return errors.New("missing source file")
 	}
 
 	if p.OutFile == "" {
 		return errors.New("missing destination file name")
 	}
 
-	if _, err := os.Stat(p.SourcePkgDir); err != nil {
-		return fmt.Errorf("source Go package %q doesn't exist: %w", p.SourcePkgDir, err)
+	if _, err := os.Stat(p.SourceFile); err != nil {
+		return fmt.Errorf("source file %q doesn't exist: %w", p.SourceFile, err)
 	}
 
 	if len(p.Omit) > 0 && len(p.Pick) > 0 {
@@ -148,7 +146,7 @@ func paramsFromFlags() (Params, error) {
 		"Package name specified in output Go file. By default is parent dir name.",
 	)
 	flag.StringVar(
-		&params.SourcePkgDir, "src", "",
+		&params.SourceFile, "src", "",
 		"Source Go file name with builtin definitions.",
 	)
 	flag.BoolVar(

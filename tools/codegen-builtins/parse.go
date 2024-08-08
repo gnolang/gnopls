@@ -28,29 +28,21 @@ func loadPackage(p Params) (PackageContext, error) {
 		ctx.insertTextFormat = protocol.InsertTextFormatSnippet
 	}
 
-	pkgs, err := parser.ParseDir(fset, p.SourcePkgDir, nil, parser.ParseComments)
+	root, err := parser.ParseFile(fset, p.SourceFile, nil, parser.ParseComments)
 	if err != nil {
-		return ctx, fmt.Errorf("can't parse source Go package: %w", err)
+		return ctx, fmt.Errorf("can't parse source Go file: %w", err)
 	}
 
 	// Usually, "go/doc" can be used to collect funcs and type info but for some reason
 	// it ignores most of declared functions in "builin.go"
-	for name, pkg := range pkgs {
-		if err := readPackage(&ctx, pkg); err != nil {
-			return ctx, fmt.Errorf("can't parse package %q: %w", name, err)
-		}
+	//
+	// Also "go/doc" requires to parse a whole directory, but we should be able to deal
+	// with non *.go files to keep them away from "go build".
+	if err := readFile(&ctx, root); err != nil {
+		return ctx, err
 	}
 
 	return ctx, nil
-}
-
-func readPackage(dst *PackageContext, pkg *ast.Package) error {
-	for name, root := range pkg.Files {
-		if err := readFile(dst, root); err != nil {
-			return fmt.Errorf("error in file %q: %w", name, err)
-		}
-	}
-	return nil
 }
 
 func readFile(dst *PackageContext, root *ast.File) error {
