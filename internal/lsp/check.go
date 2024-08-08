@@ -193,7 +193,7 @@ func (tcr *TypeCheckResult) Errors() []ErrorInfo {
 
 // Prints types.Info in a tabular form
 // Kept only for debugging purpose.
-func formatTypeInfo(fset token.FileSet, info *types.Info) string {
+func formatTypeInfo(fset *token.FileSet, info *types.Info) string {
 	var items []string = nil
 	for expr, tv := range info.Types {
 		var buf strings.Builder
@@ -215,7 +215,7 @@ func formatTypeInfo(fset token.FileSet, info *types.Info) string {
 // Prints types.Info in a tabular form
 // Kept only for debugging purpose.
 func getTypeAndValue(
-	fset token.FileSet,
+	fset *token.FileSet,
 	info *types.Info,
 	tok string,
 	line, offset int,
@@ -248,7 +248,7 @@ func getTypeAndValue(
 // Use getTypeAndValue instead
 // TODO: should be removed
 func getTypeAndValueLight(
-	fset token.FileSet,
+	fset *token.FileSet,
 	info *types.Info,
 	tok string,
 	line int,

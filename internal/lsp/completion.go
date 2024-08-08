@@ -200,7 +200,7 @@ func (s *server) Completion(ctx context.Context, reply jsonrpc2.Replier, req jso
 	switch n := paths[0].(type) {
 	case *ast.Ident:
 		_, tv := getTypeAndValue(
-			*pgf.Fset,
+			pgf.Fset,
 			pkg.TypeCheckResult.info, n.Name,
 			int(line),
 			offset,
@@ -268,7 +268,7 @@ func (s *server) Completion(ctx context.Context, reply jsonrpc2.Replier, req jso
 		return reply(ctx, nil, nil)
 	case *ast.CallExpr:
 		_, tv := getTypeAndValue(
-			*pgf.Fset,
+			pgf.Fset,
 			pkg.TypeCheckResult.info, types.ExprString(n),
 			int(line),
 			offset,

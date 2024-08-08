@@ -81,7 +81,7 @@ func (s *server) Definition(ctx context.Context, reply jsonrpc2.Replier, req jso
 	switch n := paths[0].(type) {
 	case *ast.Ident:
 		_, tv := getTypeAndValue(
-			*pkg.TypeCheckResult.fset,
+			pkg.TypeCheckResult.fset,
 			info, n.Name,
 			int(line),
 			offset,
@@ -138,7 +138,7 @@ func definitionSelectorExpr(ctx context.Context, s *server, reply jsonrpc2.Repli
 	parentStr := types.ExprString(parent)
 
 	_, tv := getTypeAndValueLight(
-		*pkg.TypeCheckResult.fset,
+		pkg.TypeCheckResult.fset,
 		pkg.TypeCheckResult.info,
 		exprStr,
 		int(line),
@@ -149,7 +149,7 @@ func definitionSelectorExpr(ctx context.Context, s *server, reply jsonrpc2.Repli
 	tvStr := tv.Type.String()
 
 	_, tvParent := getTypeAndValueLight(
-		*pkg.TypeCheckResult.fset,
+		pkg.TypeCheckResult.fset,
 		pkg.TypeCheckResult.info,
 		parentStr,
 		int(line),
