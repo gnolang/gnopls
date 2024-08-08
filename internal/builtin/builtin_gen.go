@@ -2,7 +2,7 @@
 // See: /tools/codegen-builtins
 //
 // Source: ../../tools/gendata/builtin.go.txt
-// Skipped: ComplexType,Type,Type1,IntegerType,FloatType
+// Skipped: IntegerType,FloatType,ComplexType,Type,Type1
 
 package builtin
 
@@ -33,13 +33,11 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Label:            "error",
 	}},
 	int32(102): []protocol.CompletionItem{protocol.CompletionItem{
-		Detail:           "const false = 0 != 0",
 		InsertText:       "false",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindConstant,
 		Label:            "false",
 	}, protocol.CompletionItem{
-		Detail: "type float32 float32",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "float32 is the set of all IEEE-754 32-bit floating-point numbers.\n",
@@ -49,7 +47,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "float32",
 	}, protocol.CompletionItem{
-		Detail: "type float64 float64",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "float64 is the set of all IEEE-754 64-bit floating-point numbers.\n",
@@ -60,7 +57,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Label:            "float64",
 	}},
 	int32(105): []protocol.CompletionItem{protocol.CompletionItem{
-		Detail: "type int8 int8",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "int8 is the set of all signed 8-bit integers.\nRange: -128 through 127.\n",
@@ -70,7 +66,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "int8",
 	}, protocol.CompletionItem{
-		Detail: "type int16 int16",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "int16 is the set of all signed 16-bit integers.\nRange: -32768 through 32767.\n",
@@ -80,7 +75,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "int16",
 	}, protocol.CompletionItem{
-		Detail: "type int32 int32",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "int32 is the set of all signed 32-bit integers.\nRange: -2147483648 through 2147483647.\n",
@@ -90,7 +84,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "int32",
 	}, protocol.CompletionItem{
-		Detail: "type int64 int64",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "int64 is the set of all signed 64-bit integers.\nRange: -9223372036854775808 through 9223372036854775807.\n",
@@ -100,7 +93,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "int64",
 	}, protocol.CompletionItem{
-		Detail: "type int int",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "int is a signed integer type that is at least 32 bits in size. It is a\ndistinct type, however, and not an alias for, say, int32.\n",
@@ -197,7 +189,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindFunction,
 		Label:            "recover",
 	}, protocol.CompletionItem{
-		Detail: "type rune = int32",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "rune is an alias for int32 and is equivalent to int32 in all ways. It is\nused, by convention, to distinguish character values from integer values.\n",
@@ -208,7 +199,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Label:            "rune",
 	}},
 	int32(115): []protocol.CompletionItem{protocol.CompletionItem{
-		Detail: "type string string",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "string is the set of all strings of 8-bit bytes, conventionally but not\nnecessarily representing UTF-8-encoded text. A string may be empty, but\nnot nil. Values of string type are immutable.\n",
@@ -219,14 +209,12 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Label:            "string",
 	}},
 	int32(116): []protocol.CompletionItem{protocol.CompletionItem{
-		Detail:           "const true = 0 == 0",
 		InsertText:       "true",
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 		Kind:             protocol.CompletionItemKindConstant,
 		Label:            "true",
 	}},
 	int32(117): []protocol.CompletionItem{protocol.CompletionItem{
-		Detail: "type uint8 uint8",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "uint8 is the set of all unsigned 8-bit integers.\nRange: 0 through 255.\n",
@@ -236,7 +224,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "uint8",
 	}, protocol.CompletionItem{
-		Detail: "type uint16 uint16",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "uint16 is the set of all unsigned 16-bit integers.\nRange: 0 through 65535.\n",
@@ -246,7 +233,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "uint16",
 	}, protocol.CompletionItem{
-		Detail: "type uint32 uint32",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "uint32 is the set of all unsigned 32-bit integers.\nRange: 0 through 4294967295.\n",
@@ -256,7 +242,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "uint32",
 	}, protocol.CompletionItem{
-		Detail: "type uint64 uint64",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "uint64 is the set of all unsigned 64-bit integers.\nRange: 0 through 18446744073709551615.\n",
@@ -266,7 +251,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "uint64",
 	}, protocol.CompletionItem{
-		Detail: "type uint uint",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "uint is an unsigned integer type that is at least 32 bits in size. It is a\ndistinct type, however, and not an alias for, say, uint32.\n",
@@ -276,7 +260,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "uint",
 	}, protocol.CompletionItem{
-		Detail: "type uintptr uintptr",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "uintptr is an integer type that is large enough to hold the bit pattern of\nany pointer.\n",
@@ -298,7 +281,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Label:            "append",
 	}},
 	int32(98): []protocol.CompletionItem{protocol.CompletionItem{
-		Detail: "type bool bool",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "bool is the set of boolean values, true and false.\n",
@@ -308,7 +290,6 @@ var buckets = map[rune][]protocol.CompletionItem{
 		Kind:             protocol.CompletionItemKindClass,
 		Label:            "bool",
 	}, protocol.CompletionItem{
-		Detail: "type byte = uint8",
 		Documentation: protocol.MarkupContent{
 			Kind:  protocol.Markdown,
 			Value: "byte is an alias for uint8 and is equivalent to uint8 in all ways. It is\nused, by convention, to distinguish byte values from 8-bit unsigned\ninteger values.\n",

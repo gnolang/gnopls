@@ -94,24 +94,30 @@ func typeToCompletionItem(fset *token.FileSet, ctx ParentCtx, spec *ast.TypeSpec
 		InsertTextFormat: protocol.InsertTextFormatPlainText,
 	}
 
+	isPrimitive := false
 	switch spec.Type.(type) {
 	case *ast.InterfaceType:
 		item.Kind = protocol.CompletionItemKindInterface
 	case *ast.StructType:
 		item.InsertText = item.InsertText + "{}"
 		item.Kind = protocol.CompletionItemKindStruct
+	case *ast.Ident:
+		isPrimitive = true
 	}
 
 	if !ctx.isDeclGroup {
 		declCommentGroup = ctx.decl.Doc
 	}
 
-	signature, err := typeToString(fset, ctx.decl)
-	if err != nil {
-		return item, fmt.Errorf("%w (type: %q)", err, item.Label)
+	if !isPrimitive {
+		signature, err := typeToString(fset, ctx.decl)
+		if err != nil {
+			return item, fmt.Errorf("%w (type: %q)", err, item.Label)
+		}
+
+		item.Detail = signature
 	}
 
-	item.Detail = signature
 	item.Documentation = parseDocGroup(declCommentGroup)
 	return item, nil
 }
@@ -128,22 +134,28 @@ func valueToCompletionItem(fset *token.FileSet, ctx ParentCtx, spec *ast.ValueSp
 			continue
 		}
 
-		signature, err := typeToString(fset, val.Obj.Decl)
-		if err != nil {
-			return nil, fmt.Errorf("%w (value name: %s)", err, val.Name)
-		}
-
-		// declaration type is not present in value block.
-		if signature != "" {
-			signature = ctx.decl.Tok.String() + " " + signature
-		}
 		item := protocol.CompletionItem{
 			Kind:             ctx.tokenKind,
 			Label:            val.Name,
 			InsertText:       val.Name,
-			Detail:           signature,
 			InsertTextFormat: protocol.InsertTextFormatPlainText,
 			Documentation:    blockDoc,
+		}
+
+		switch val.Name {
+		case "true", "false":
+		default:
+			signature, err := typeToString(fset, val.Obj.Decl)
+			if err != nil {
+				return nil, fmt.Errorf("%w (value name: %s)", err, val.Name)
+			}
+
+			// declaration type is not present in value block.
+			if signature != "" {
+				signature = ctx.decl.Tok.String() + " " + signature
+			}
+
+			item.Detail = signature
 		}
 
 		items = append(items, item)
