@@ -155,10 +155,8 @@ func valueToCompletionItem(fset *token.FileSet, ctx ParentCtx, spec *ast.ValueSp
 func funcToCompletionItem(fset *token.FileSet, format protocol.InsertTextFormat, fn *ast.FuncDecl) (item protocol.CompletionItem, err error) {
 	isSnippet := format == protocol.InsertTextFormatSnippet
 	item = protocol.CompletionItem{
-		Label: fn.Name.String(),
-		Kind:  protocol.CompletionItemKindFunction,
-
-		// Not all LSP clients support snippet mode.
+		Label:            fn.Name.String(),
+		Kind:             protocol.CompletionItemKindFunction,
 		InsertTextFormat: format,
 		InsertText:       buildFuncInsertStatement(fn, isSnippet),
 		Documentation:    parseDocGroup(fn.Doc),
