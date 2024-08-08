@@ -11,6 +11,19 @@ import (
 
 type StringSet map[string]struct{}
 
+func (set StringSet) toList() []string {
+	if len(set) == 0 {
+		return nil
+	}
+
+	list := make([]string, 0, len(set))
+	for val := range set {
+		list = append(list, val)
+	}
+
+	return list
+}
+
 type Filter interface {
 	allow(v string) bool
 }
@@ -52,6 +65,15 @@ type Params struct {
 
 	// Pick is a list of symbols to process. Opposite to Omit.
 	Pick StringSet
+}
+
+func (p Params) GenContext() GenContext {
+	return GenContext{
+		PackageName: p.OutPackageName,
+		SourcePath:  p.SourcePkgDir,
+		OmitSymbols: p.Omit.toList(),
+		PickSymbols: p.Pick.toList(),
+	}
 }
 
 func (p Params) withDefaults() (Params, error) {
@@ -110,7 +132,7 @@ func (p Params) getFilter() Filter {
 	return NopFilter{}
 }
 
-func paramsFromFlags() Params {
+func paramsFromFlags() (Params, error) {
 	var params Params
 	flag.StringVar(
 		&params.OutFile, "dest", "",
@@ -135,11 +157,11 @@ func paramsFromFlags() Params {
 		"Comma-separated list of symbols to skip. Opposite to -pick flag.",
 	)
 
+	flag.Parse()
+
 	params.Omit = setFromCSV(omitList)
 	params.Pick = setFromCSV(pickList)
-
-	flag.Parse()
-	return params
+	return params.withDefaults()
 }
 
 func setFromCSV(str string) StringSet {

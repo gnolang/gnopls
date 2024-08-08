@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"unicode"
 
 	"go.lsp.dev/protocol"
 )
@@ -24,7 +23,7 @@ func mainErr() error {
 		usageFunc()
 	}
 
-	params, err := paramsFromFlags().withDefaults()
+	params, err := paramsFromFlags()
 	if err != nil {
 		return err
 	}
@@ -37,12 +36,6 @@ func mainErr() error {
 }
 
 func run(p Params) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %s", err)
-		}
-	}()
-
 	pkg, err := loadPackage(p)
 	if err != nil {
 		return err
@@ -57,9 +50,10 @@ func run(p Params) (err error) {
 }
 
 func collectCompletionItems(pkg PackageContext) ([]protocol.CompletionItem, error) {
-	symbols := make([]protocol.CompletionItem, 0, len(pkg.doc.Funcs)+len(pkg.doc.Types))
-	for _, fn := range pkg.doc.Funcs {
-		if !pkg.filter.allow(fn.Name) {
+	symbols := make([]protocol.CompletionItem, 0, len(pkg.funcs)+len(pkg.decls))
+
+	for _, fn := range pkg.funcs {
+		if !pkg.filter.allow(fn.Name.Name) {
 			continue
 		}
 
@@ -71,18 +65,13 @@ func collectCompletionItems(pkg PackageContext) ([]protocol.CompletionItem, erro
 		symbols = append(symbols, item)
 	}
 
-	for _, typ := range pkg.doc.Types {
-		if !pkg.filter.allow(typ.Name) {
-			continue
+	for _, typeDecl := range pkg.decls {
+		items, err := declToCompletionItem(pkg.fset, pkg.filter, typeDecl)
+		if err != nil {
+			return nil, err
 		}
 
-		// Stub types (e.g. `IntegerType`) start with capital letter and should be ignored.
-		if unicode.IsUpper(rune(typ.Name[0])) {
-			continue
-		}
-
-		item := typeToCompletionItem(pkg.fset, typ)
-		symbols = append(symbols, item)
+		symbols = append(symbols, items...)
 	}
 
 	return symbols, nil
@@ -94,7 +83,7 @@ func saveFile(p Params, items []protocol.CompletionItem) error {
 		return fmt.Errorf("failed to create output parent directory: %w", err)
 	}
 
-	src, err := buildSourceFile(p.OutPackageName, items)
+	src, err := generateSourceFile(p.GenContext(), items)
 	if err != nil {
 		return fmt.Errorf("cannot generate Go file: %w", err)
 	}
