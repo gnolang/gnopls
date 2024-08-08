@@ -372,7 +372,6 @@ func completionPackageIdent(ctx context.Context, s *server, reply jsonrpc2.Repli
 					})
 				}
 				break
-				//return reply(ctx, items, nil)
 			}
 		}
 	}

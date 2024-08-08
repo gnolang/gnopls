@@ -95,7 +95,7 @@ func parseDocGroup(group *ast.CommentGroup) *protocol.MarkupContent {
 	}
 
 	str := w.String()
-	strings.CutSuffix(str, "\n")
+	str, _ = strings.CutSuffix(str, "\n")
 
 	return &protocol.MarkupContent{
 		Kind:  protocol.Markdown,
