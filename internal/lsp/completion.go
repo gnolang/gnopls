@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gnolang/gnopls/internal/builtin"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -19,6 +18,7 @@ import (
 	"unicode"
 
 	"github.com/gnolang/gno/gnovm/pkg/gnomod"
+	"github.com/gnolang/gnopls/internal/builtin"
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/protocol"
