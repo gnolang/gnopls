@@ -6,6 +6,8 @@ import (
 	"go.lsp.dev/protocol"
 )
 
+//go:generate go run ../../tools/codegen-builtins -src ../../tools/gendata/builtin -dest ./builtin_gen.go -omit Type,Type1,IntegerType,FloatType,ComplexType
+
 // GetCompletions provides list of builtin symbols that has passed prefix in a name.
 func GetCompletions(prefix string) []protocol.CompletionItem {
 	prefix = strings.TrimSpace(prefix)

@@ -3,7 +3,7 @@ PROJECT_NAME = gnopls
 BUILD_FLAGS = -mod=readonly -ldflags='$(LD_FLAGS)'
 BUILD_FOLDER = ./build
 
-.PHONY: install build clean codegen-builtins
+.PHONY: install build clean gen
 
 ## install: Install the binary.
 install:
@@ -23,10 +23,6 @@ clean:
 	@-rm -rf $(BUILD_FOLDER) 2> /dev/null
 	@go clean ./...
 
-## codegen-builtins: generates list of Gno predefined internal symbols for LSP server.
-codegen-builtins:
-	@go run ./tools/codegen-builtins \
-	 -omit 'Type,Type1,IntegerType,FloatType,ComplexType' \
-	 -src ./tools/gendata/builtin \
-	 -dest ./internal/builtin/builtin_gen.go \
-	 $(CODEGEN_OPTS)
+## gen: runs "go:generate" across all Go files
+gen:
+	@find . -name '*.go' -print0 | xargs -0 grep -l '//go:generate' | xargs -I {} go generate {}
