@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gnolang/gnopls/internal/builtin"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -330,6 +331,10 @@ func (s *server) Completion(ctx context.Context, reply jsonrpc2.Replier, req jso
 }
 
 func completionPackageIdent(ctx context.Context, s *server, reply jsonrpc2.Replier, params protocol.CompletionParams, pgf *ParsedGnoFile, i *ast.Ident, includeFuncs bool) error {
+	// This function is called not just for packages but also as fallback for unresolved cases.
+	// So, let's also propose builtins first.
+	items := builtin.GetCompletions(i.Name)
+
 	for _, spec := range pgf.File.Imports {
 		path := spec.Path.Value[1 : len(spec.Path.Value)-1]
 		parts := strings.Split(path, "/")
@@ -337,7 +342,6 @@ func completionPackageIdent(ctx context.Context, s *server, reply jsonrpc2.Repli
 		if last == i.Name {
 			pkg := s.completionStore.lookupPkg(last)
 			if pkg != nil {
-				items := []protocol.CompletionItem{}
 				if includeFuncs {
 					for _, f := range pkg.Functions {
 						if !f.IsExported() {
@@ -367,12 +371,13 @@ func completionPackageIdent(ctx context.Context, s *server, reply jsonrpc2.Repli
 						Documentation: s.Doc,
 					})
 				}
-				return reply(ctx, items, nil)
+				break
+				//return reply(ctx, items, nil)
 			}
 		}
 	}
 
-	return reply(ctx, nil, nil)
+	return reply(ctx, items, nil)
 }
 
 // End
