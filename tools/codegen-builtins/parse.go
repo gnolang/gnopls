@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go.lsp.dev/protocol"
 	"go/ast"
 	"go/parser"
 	"go/token"
+
+	"go.lsp.dev/protocol"
 )
 
 type PackageContext struct {

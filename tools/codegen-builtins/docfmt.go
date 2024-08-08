@@ -1,9 +1,10 @@
 package main
 
 import (
-	"go.lsp.dev/protocol"
 	"go/ast"
 	"strings"
+
+	"go.lsp.dev/protocol"
 )
 
 const (
