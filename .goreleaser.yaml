@@ -1,6 +1,11 @@
 project_name: gnopls
+
+before:
+  hooks:
+    - go mod tidy
+
 builds:
-  - main: .
+  - id: gnopls
     ldflags:
       - -s -w -X github.com/gnolang/gnopls/internal/version.Version={{.Tag}}
     goos:
@@ -10,3 +15,12 @@ builds:
       - amd64
       - arm64
     binary: gnopls
+
+changelog:
+  sort: asc
+
+release:
+  draft: true
+  replace_existing_draft: true
+  prerelease: auto
+  mode: append
