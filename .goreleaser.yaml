@@ -6,15 +6,17 @@ before:
 
 builds:
   - id: gnopls
-    ldflags:
-      - -s -w -X github.com/gnolang/gnopls/internal/version.Version={{.Tag}}
+    binary: gnopls
     goos:
       - linux
       - darwin
+      - js
     goarch:
       - amd64
       - arm64
-    binary: gnopls
+      - wasm
+    ldflags:
+      - -s -w -X 'github.com/gnolang/gnopls/internal/version.Version={{.Tag}}'
 
 changelog:
   sort: asc
