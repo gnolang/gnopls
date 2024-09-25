@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"path/filepath"
 
+	"github.com/gnolang/gnopls/internal/tools"
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/protocol"
 )
@@ -77,5 +78,7 @@ func (s *server) DidSave(ctx context.Context, reply jsonrpc2.Replier, req jsonrp
 	slog.Info("save " + string(uri.Filename()))
 	s.UpdateCache(filepath.Dir(string(params.TextDocument.URI.Filename())))
 	notification := s.publishDiagnostics(ctx, s.conn, file)
+
+	tools.Lint(ctx, s.conn, uri)
 	return reply(ctx, notification, nil)
 }
