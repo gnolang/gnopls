@@ -79,6 +79,6 @@ func (s *server) DidSave(ctx context.Context, reply jsonrpc2.Replier, req jsonrp
 	s.UpdateCache(filepath.Dir(string(params.TextDocument.URI.Filename())))
 	notification := s.publishDiagnostics(ctx, s.conn, file)
 
-	tools.Lint(ctx, s.conn, uri)
+	tools.Lint(ctx, s.conn, params.Text, uri)
 	return reply(ctx, notification, nil)
 }
