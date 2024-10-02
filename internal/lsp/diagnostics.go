@@ -10,12 +10,12 @@ import (
 	"go.lsp.dev/protocol"
 )
 
-func (s *server) publishDiagnostics(ctx context.Context, conn jsonrpc2.Conn, file *GnoFile) error {
+func (s *server) getTranspileDiagnostics(ctx context.Context, conn jsonrpc2.Conn, file *GnoFile) ([]protocol.Diagnostic, error) {
 	slog.Info("Lint", "path", file.URI.Filename())
 
 	errors, err := s.TranspileAndBuild(file)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if pkg, ok := s.cache.pkgs.Get(filepath.Dir(string(file.URI.Filename()))); ok {
@@ -40,6 +40,10 @@ func (s *server) publishDiagnostics(ctx context.Context, conn jsonrpc2.Conn, fil
 		})
 	}
 
+	return diagnostics, nil
+}
+
+func (s *server) publishDiagnostics(ctx context.Context, conn jsonrpc2.Conn, file *GnoFile, diagnostics []protocol.Diagnostic) error {
 	return conn.Notify(
 		ctx,
 		protocol.MethodTextDocumentPublishDiagnostics,
