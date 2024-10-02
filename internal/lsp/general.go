@@ -85,10 +85,14 @@ func (s *server) DidSave(ctx context.Context, reply jsonrpc2.Replier, req jsonrp
 	transpileDiags, err := s.getTranspileDiagnostics(file)
 	if err == nil {
 		diagnostics = append(diagnostics, transpileDiags...)
+	} else {
+		slog.Error("TRANSPILE", "error", err)
 	}
 	diags, err := tools.Lint(ctx, s.conn, params.Text, uri)
 	if err == nil {
 		diagnostics = append(diagnostics, diags...)
+	} else {
+		slog.Error("LINT", "error", err)
 	}
 
 	notification := s.publishDiagnostics(ctx, s.conn, file, diagnostics)
