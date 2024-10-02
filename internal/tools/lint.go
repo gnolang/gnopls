@@ -8,16 +8,16 @@ import (
 	"go.lsp.dev/protocol"
 )
 
-func Lint(ctx context.Context, conn jsonrpc2.Conn, text string, uri protocol.DocumentURI) error {
+func Lint(ctx context.Context, conn jsonrpc2.Conn, text string, uri protocol.DocumentURI) ([]protocol.Diagnostic, error) {
 	parsedText := []byte(text)
 
 	engine, err := lint.New("", parsedText)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	issues, err := lint.ProcessSource(engine, parsedText)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// send the diagnostics
@@ -26,12 +26,12 @@ func Lint(ctx context.Context, conn jsonrpc2.Conn, text string, uri protocol.Doc
 		diagnostics[i] = protocol.Diagnostic{
 			Range: protocol.Range{
 				Start: protocol.Position{
-					Line:      uint32(issue.Start.Line),
-					Character: uint32(issue.Start.Column),
+					Line:      uint32(issue.Start.Line - 1),
+					Character: uint32(issue.Start.Column - 1),
 				},
 				End: protocol.Position{
-					Line:      uint32(issue.End.Line),
-					Character: uint32(issue.End.Column),
+					Line:      uint32(issue.End.Line - 1),
+					Character: uint32(issue.End.Column - 1),
 				},
 			},
 			Severity: protocol.DiagnosticSeverityError,
@@ -40,12 +40,5 @@ func Lint(ctx context.Context, conn jsonrpc2.Conn, text string, uri protocol.Doc
 			Source:   "gnopls",
 		}
 	}
-	notification := protocol.PublishDiagnosticsParams{
-		URI:         uri,
-		Diagnostics: diagnostics,
-	}
-	if err := conn.Notify(ctx, protocol.MethodTextDocumentPublishDiagnostics, notification); err != nil {
-		return err
-	}
-	return nil
+	return diagnostics, nil
 }
