@@ -3,8 +3,7 @@ package tools
 import (
 	"context"
 
-	"github.com/gnoswap-labs/tlin/internal"
-	"github.com/gnoswap-labs/tlin/lint"
+	"github.com/gnolang/tlin/lint"
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/protocol"
 )
@@ -12,7 +11,7 @@ import (
 func Lint(ctx context.Context, conn jsonrpc2.Conn, text string, uri protocol.DocumentURI) error {
 	parsedText := []byte(text)
 
-	engine, err := internal.NewEngine("", parsedText)
+	engine, err := lint.New("", parsedText)
 	if err != nil {
 		return err
 	}
@@ -48,4 +47,5 @@ func Lint(ctx context.Context, conn jsonrpc2.Conn, text string, uri protocol.Doc
 	if err := conn.Notify(ctx, protocol.MethodTextDocumentPublishDiagnostics, notification); err != nil {
 		return err
 	}
+	return nil
 }

@@ -7,6 +7,7 @@ toolchain go1.23.0
 require (
 	github.com/dave/jennifer v1.7.0
 	github.com/gnolang/gno v0.0.0-20240118150545-7aa81d138701
+	github.com/gnolang/tlin v1.0.1-0.20240930090350-be21dd15c7aa
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/spf13/cobra v1.5.0
@@ -34,7 +35,6 @@ require (
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/gnolang/goleveldb v0.0.9 // indirect
 	github.com/gnolang/overflow v0.0.0-20170615021017-4d914c927216 // indirect
-	github.com/gnoswap-labs/tlin v1.0.1-0.20240927064030-49c75b0bee93 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
@@ -55,7 +55,6 @@ require (
 	github.com/segmentio/asm v1.1.3 // indirect
 	github.com/segmentio/encoding v0.3.4 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	go.etcd.io/bbolt v1.3.8 // indirect
 	go.opencensus.io v0.22.5 // indirect
