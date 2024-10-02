@@ -2,8 +2,6 @@ module github.com/gnolang/gnopls
 
 go 1.22.2
 
-toolchain go1.23.0
-
 require (
 	github.com/dave/jennifer v1.7.0
 	github.com/gnolang/gno v0.0.0-20240118150545-7aa81d138701
