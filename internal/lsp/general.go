@@ -27,7 +27,7 @@ func (s *server) DidOpen(ctx context.Context, reply jsonrpc2.Replier, req jsonrp
 
 	slog.Info("open " + string(params.TextDocument.URI.Filename()))
 	s.UpdateCache(filepath.Dir(string(params.TextDocument.URI.Filename())))
-	diagnostics, err := s.getTranspileDiagnostics(ctx, s.conn, file)
+	diagnostics, err := s.getTranspileDiagnostics(file)
 	if err != nil {
 		return sendParseError(ctx, reply, err)
 	}
@@ -82,7 +82,7 @@ func (s *server) DidSave(ctx context.Context, reply jsonrpc2.Replier, req jsonrp
 	slog.Info("save " + string(uri.Filename()))
 	s.UpdateCache(filepath.Dir(string(params.TextDocument.URI.Filename())))
 	diagnostics := []protocol.Diagnostic{}
-	transpileDiags, err := s.getTranspileDiagnostics(ctx, s.conn, file)
+	transpileDiags, err := s.getTranspileDiagnostics(file)
 	if err == nil {
 		diagnostics = append(diagnostics, transpileDiags...)
 	}
