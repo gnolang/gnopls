@@ -1,0 +1,58 @@
+# Init phase
+lsp initialize input/initialize.json
+lsp initialized input/initialized.json
+lsp workspace/didChangeConfiguration input/didChangeConfiguration.json
+lsp textDocument/didOpen input/didOpen_x.json
+
+lsp textDocument/formatting input/formatting.json
+cmp output/formatting.json expected/formatting.json
+-- x.gno --
+package foo
+func Hello() {
+ufmt.Sprintf()
+}
+-- input/initialize.json --
+{
+	"rootUri": "file://$WORK"
+}
+-- input/initialized.json --
+{}
+-- input/didChangeConfiguration.json --
+{
+	"settings": {
+		"gno":              "$GOBIN/gno",
+		"gopls":            "$GOBIN/gopls",
+		"root":             "$GNOPATH",
+		"precompileOnSave": true,
+		"buildOnSave":      true
+	}
+}
+-- input/didOpen_x.json --
+{
+	"textDocument": {
+		"uri":"file://$WORK/x.gno",
+		"text":"${FILE_x.gno}"
+	}
+}
+-- input/formatting.json --
+{
+	"textDocument": {
+		"uri":"file://$WORK/x.gno"
+	}
+}
+-- expected/formatting.json --
+[
+  {
+    "newText": "package foo\n\nimport \"gno.land/p/demo/ufmt\"\n\nfunc Hello() {\n\tufmt.Sprintf()\n}\n",
+    "range": {
+      "end": {
+        "character": 2147483647,
+        "line": 2147483647
+      },
+      "start": {
+        "character": 0,
+        "line": 0
+      }
+    }
+  }
+]

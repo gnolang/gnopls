@@ -3,7 +3,6 @@ package lsp
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log/slog"
 	"math"
 
@@ -20,14 +19,10 @@ func (s *server) Formatting(ctx context.Context, reply jsonrpc2.Replier, req jso
 	}
 
 	uri := params.TextDocument.URI
-	file, ok := s.snapshot.Get(uri.Filename())
-	if !ok {
-		return reply(ctx, nil, errors.New("snapshot not found"))
-	}
 
-	formatted, err := tools.Format(string(file.Src), s.formatOpt)
+	formatted, err := tools.Format(uri.Filename())
 	if err != nil {
-		return reply(ctx, nil, err)
+		return replyErr(ctx, reply, err)
 	}
 
 	slog.Info("format " + string(params.TextDocument.URI.Filename()))

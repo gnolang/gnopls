@@ -1,34 +1,16 @@
 package tools
 
 import (
-	"errors"
-	"go/format"
-
-	gofumpt "mvdan.cc/gofumpt/format"
+	"fmt"
+	"os/exec"
+	"strings"
 )
 
-type FormattingOption int
-
-const (
-	Gofmt FormattingOption = iota
-	Gofumpt
-)
-
-func Format(data string, opt FormattingOption) ([]byte, error) {
-	switch opt {
-	case Gofmt:
-		return RunGofmt(data)
-	case Gofumpt:
-		return RunGofumpt(data)
-	default:
-		return nil, errors.New("gnopls: invalid formatting option")
+func Format(file string) ([]byte, error) {
+	cmd := exec.Command("gno", "fmt", file)
+	bz, err := cmd.CombinedOutput()
+	if err != nil {
+		return bz, fmt.Errorf("running '%s': %w: %s", strings.Join(cmd.Args, " "), err, string(bz))
 	}
-}
-
-func RunGofmt(data string) ([]byte, error) {
-	return format.Source([]byte(data))
-}
-
-func RunGofumpt(data string) ([]byte, error) {
-	return gofumpt.Source([]byte(data), gofumpt.Options{})
+	return bz, nil
 }
