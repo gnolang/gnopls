@@ -31,15 +31,24 @@ func (s *server) TranspileAndBuild(file *GnoFile) ([]ErrorInfo, error) {
 		return nil, err
 	}
 
-	preOut, _ := tools.Transpile(tmpDir)
-	slog.Info(string(preOut))
+	preOut, err := tools.Transpile(tmpDir)
 	if len(preOut) > 0 {
+		slog.Info("transpile error", "out", string(preOut))
 		return parseErrors(file, string(preOut), "transpile")
 	}
+	if err != nil {
+		return nil, err
+	}
 
-	buildOut, _ := tools.Build(tmpDir)
-	slog.Info(string(buildOut))
-	return parseErrors(file, string(buildOut), "build")
+	buildOut, err := tools.Build(tmpDir)
+	if len(buildOut) > 0 {
+		slog.Info("build error", "out", string(buildOut))
+		return parseErrors(file, string(buildOut), "build")
+	}
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 // This is used to extract information from the `gno build` command

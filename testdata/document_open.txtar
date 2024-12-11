@@ -4,16 +4,16 @@ lsp initialized input/initialized.json
 
 # open document w/o errors
 lsp textDocument/didOpen input/didOpen_x.json
-cmpenv output/notify1.json expected/notify1.json
 
 # open document with errors
 lsp textDocument/didOpen input/didOpen_y.json
-cmpenv output/notify2.json expected/notify2.json
 
 # gno transpile should have created a *.gno.gen.go files
 cmp $GNOPLS_WD/script-document_open/x.gno.gen.go x.gno.gen.go.golden
 cmp $GNOPLS_WD/script-document_open/y.gno.gen.go y.gno.gen.go.golden
 
+cmpenv output/notify1.json expected/notify1.json
+cmpenv output/notify2.json expected/notify2.json
 -- x.gno --
 package foo
 
