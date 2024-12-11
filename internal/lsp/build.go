@@ -24,6 +24,7 @@ func (s *server) TranspileAndBuild(file *GnoFile) ([]ErrorInfo, error) {
 	pkgDir := filepath.Dir(file.URI.Filename())
 	pkgName := filepath.Base(pkgDir)
 	tmpDir := filepath.Join(s.env.GNOHOME, "gnopls", "tmp", pkgName)
+	fmt.Println("TMPDIR", tmpDir)
 
 	err := copyDir(pkgDir, tmpDir)
 	if err != nil {
