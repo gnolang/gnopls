@@ -1,0 +1,51 @@
+# Init phase
+lsp initialize input/initialize.json
+lsp initialized input/initialized.json
+lsp textDocument/didOpen input/didOpen_x.json
+
+lsp textDocument/hover input/hover.json
+cmp output/hover.json expected/hover.json
+-- x.gno --
+package foo
+
+func Hello() {}
+-- input/initialize.json --
+{
+	"rootUri": "file://$WORK"
+}
+-- input/initialized.json --
+{}
+-- input/didOpen_x.json --
+{
+	"textDocument": {
+		"uri":"file://$WORK/x.gno",
+		"text":"${FILE_x.gno}"
+	}
+}
+-- input/hover.json --
+{
+	"textDocument": {
+		"uri":"file://$WORK/x.gno"
+	},
+	"position": {
+		"line": 2,
+		"character": 7
+	}
+}
+-- expected/hover.json --
+{
+  "contents": {
+    "kind": "markdown",
+    "value": "```gno\nfunc Hello()\n```\n\n"
+  },
+  "range": {
+    "end": {
+      "character": 23,
+      "line": 1
+    },
+    "start": {
+      "character": 18,
+      "line": 1
+    }
+  }
+}

@@ -1,0 +1,11 @@
+lsp initialized input/initialized.json
+cmp output/initialized.json expected/initialized.json
+-- input/initialized.json --
+{}
+-- expected/initialized.json --
+{
+  "error": {
+    "code": -32002,
+    "message": "server not initialized"
+  }
+}

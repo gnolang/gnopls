@@ -1,0 +1,42 @@
+lsp initialize input/initialize.json
+cmpenv output/initialize.json expected/initialize.json
+
+lsp initialized input/initialized.json
+cmp output/initialized.json expected/initialized.json
+-- input/initialize.json --
+{
+	"rootUri": "file://$WORK"
+}
+-- input/initialized.json --
+{}
+-- expected/initialize.json --
+{
+  "capabilities": {
+    "completionProvider": {
+      "triggerCharacters": [
+        "."
+      ]
+    },
+    "definitionProvider": true,
+    "documentFormattingProvider": true,
+    "executeCommandProvider": {
+      "commands": [
+        "gnopls.version"
+      ]
+    },
+    "hoverProvider": true,
+    "textDocumentSync": {
+      "change": 1,
+      "openClose": true,
+      "save": {
+        "includeText": true
+      }
+    }
+  },
+  "serverInfo": {
+    "name": "gnopls",
+    "version": "$GNOPLS_VERSION"
+  }
+}
+-- expected/initialized.json --
+null

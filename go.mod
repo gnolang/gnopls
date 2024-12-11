@@ -8,6 +8,7 @@ require (
 	github.com/gnolang/tlin v1.0.1-0.20240930090350-be21dd15c7aa
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/orcaman/concurrent-map/v2 v2.0.1
+	github.com/rogpeppe/go-internal v1.11.0
 	github.com/spf13/cobra v1.5.0
 	go.lsp.dev/jsonrpc2 v0.10.0
 	go.lsp.dev/pkg v0.0.0-20210717090340-384b27a52fb2

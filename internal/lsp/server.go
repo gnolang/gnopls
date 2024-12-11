@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/protocol"
@@ -23,7 +24,8 @@ type server struct {
 	completionStore *CompletionStore
 	cache           *Cache
 
-	formatOpt tools.FormattingOption
+	formatOpt   tools.FormattingOption
+	initialized atomic.Bool
 }
 
 func BuildServerHandler(conn jsonrpc2.Conn, e *env.Env) jsonrpc2.Handler {
@@ -48,30 +50,39 @@ func BuildServerHandler(conn jsonrpc2.Conn, e *env.Env) jsonrpc2.Handler {
 }
 
 func (s *server) ServerHandler(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	if req.Method() == protocol.MethodInitialize {
+		err := s.Initialize(ctx, reply, req)
+		if err != nil {
+			return err
+		}
+		s.initialized.Store(true)
+		return nil
+	}
+	if !s.initialized.Load() {
+		return replyErr(ctx, reply, jsonrpc2.NewError(jsonrpc2.ServerNotInitialized, "server not initialized"))
+	}
 	switch req.Method() {
-	case "exit":
+	case protocol.MethodExit:
 		return s.Exit(ctx, reply, req)
-	case "initialize":
-		return s.Initialize(ctx, reply, req)
-	case "initialized":
+	case protocol.MethodInitialized:
 		return s.Initialized(ctx, reply, req)
-	case "shutdown":
+	case protocol.MethodShutdown:
 		return s.Shutdown(ctx, reply, req)
-	case "textDocument/didChange":
+	case protocol.MethodTextDocumentDidChange:
 		return s.DidChange(ctx, reply, req)
-	case "textDocument/didClose":
+	case protocol.MethodTextDocumentDidClose:
 		return s.DidClose(ctx, reply, req)
-	case "textDocument/didOpen":
+	case protocol.MethodTextDocumentDidOpen:
 		return s.DidOpen(ctx, reply, req)
-	case "textDocument/didSave":
+	case protocol.MethodTextDocumentDidSave:
 		return s.DidSave(ctx, reply, req)
-	case "textDocument/formatting":
+	case protocol.MethodTextDocumentFormatting:
 		return s.Formatting(ctx, reply, req)
-	case "textDocument/hover":
+	case protocol.MethodTextDocumentHover:
 		return s.Hover(ctx, reply, req)
-	case "textDocument/completion":
+	case protocol.MethodTextDocumentCompletion:
 		return s.Completion(ctx, reply, req)
-	case "textDocument/definition":
+	case protocol.MethodTextDocumentDefinition:
 		return s.Definition(ctx, reply, req)
 	default:
 		return jsonrpc2.MethodNotFoundHandler(ctx, reply, req)
