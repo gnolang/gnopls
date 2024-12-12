@@ -24,31 +24,21 @@ func (s *server) TranspileAndBuild(file *GnoFile) ([]ErrorInfo, error) {
 	pkgDir := filepath.Dir(file.URI.Filename())
 	pkgName := filepath.Base(pkgDir)
 	tmpDir := filepath.Join(s.env.GNOHOME, "gnopls", "tmp", pkgName)
-	fmt.Println("TMPDIR", tmpDir)
 
 	err := copyDir(pkgDir, tmpDir)
 	if err != nil {
 		return nil, err
 	}
 
-	preOut, err := tools.Transpile(tmpDir)
+	preOut, _ := tools.Transpile(tmpDir)
+	slog.Info(string(preOut))
 	if len(preOut) > 0 {
-		slog.Info("transpile error", "out", string(preOut))
 		return parseErrors(file, string(preOut), "transpile")
 	}
-	if err != nil {
-		return nil, err
-	}
 
-	buildOut, err := tools.Build(tmpDir)
-	if len(buildOut) > 0 {
-		slog.Info("build error", "out", string(buildOut))
-		return parseErrors(file, string(buildOut), "build")
-	}
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	buildOut, _ := tools.Build(tmpDir)
+	slog.Info(string(buildOut))
+	return parseErrors(file, string(buildOut), "build")
 }
 
 // This is used to extract information from the `gno build` command

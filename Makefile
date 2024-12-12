@@ -3,7 +3,7 @@ PROJECT_NAME = gnopls
 BUILD_FLAGS = -mod=readonly -ldflags='$(LD_FLAGS)'
 BUILD_FOLDER = ./build
 
-.PHONY: install build clean gen
+.PHONY: install build clean gen test deps
 
 ## install: Install the binary.
 install:
@@ -26,3 +26,12 @@ clean:
 ## gen: runs "go:generate" across all Go files
 gen:
 	@find . -name '*.go' -print0 | xargs -0 grep -l '//go:generate' | xargs -I {} go generate {}
+
+test: deps
+	@echo Testing $(PROJECT_NAME)...
+	@go test -v ./...
+
+deps:
+	@echo Installing Gno dependency...
+	@go install github.com/gnolang/gno/gnovm/cmd/gno@master
+
