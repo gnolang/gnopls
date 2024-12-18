@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -8,9 +9,12 @@ import (
 
 func Format(file string) ([]byte, error) {
 	cmd := exec.Command("gno", "fmt", file)
-	bz, err := cmd.CombinedOutput()
+	var stdin, stderr bytes.Buffer
+	cmd.Stdout = &stdin
+	cmd.Stderr = &stderr
+	err := cmd.Run()
 	if err != nil {
-		return bz, fmt.Errorf("running '%s': %w: %s", strings.Join(cmd.Args, " "), err, string(bz))
+		return nil, fmt.Errorf("running '%s': %w: %s", strings.Join(cmd.Args, " "), err, stderr.String())
 	}
-	return bz, nil
+	return stdin.Bytes(), nil
 }
