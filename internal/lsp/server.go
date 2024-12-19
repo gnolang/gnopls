@@ -47,6 +47,7 @@ func BuildServerHandler(conn jsonrpc2.Conn, e *env.Env) jsonrpc2.Handler {
 }
 
 func (s *server) ServerHandler(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+	slog.Info("handle", "method", req.Method())
 	if req.Method() == protocol.MethodInitialize {
 		err := s.Initialize(ctx, reply, req)
 		if err != nil {
